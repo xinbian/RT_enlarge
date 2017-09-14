@@ -8,6 +8,11 @@ import h5py
 import numpy as np
 import pylab
 import matplotlib.pyplot as plt
+import sys
+import os.path
+parent = os.path.abspath(os.path.join(os.path.dirname(__file__),'.'))
+sys.path.append(parent)
+
 
 nx=2
 ny=256
