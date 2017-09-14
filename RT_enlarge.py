@@ -6,93 +6,108 @@ extend RT domain
 
 import h5py
 import numpy as np
-import pylab
-import matplotlib.pyplot as plt
-import sys
 import os.path
-parent = os.path.abspath(os.path.join(os.path.dirname(__file__),'.'))
-sys.path.append(parent)
 
 
-nx=2
-ny=256
-nz=1024
+current_directory = os.path.dirname(__file__)
+parent_directory = os.path.split(current_directory)[0]
+
 gamma=0.8
 rhoL=1
 rhoH=1.0833
-dz=3.2/nz
+g=1.0
 
+mylist = [parent_directory,'/','temp.h5']
+delimiter = ''
+filepath = delimiter.join(mylist)
 #nz enlarge only 
 variable = ['PVx','PVy','PVz','PPress', 'Prho']
-h5file = h5py.File('tests_single.h5','r')
-h5new = h5py.File('tests_single_large.h5','w-')
+h5file = h5py.File(filepath,'r')
+mylist = [parent_directory,'/','tests_single_large.h5']
+delimiter = ''
+filepath = delimiter.join(mylist)
+h5new = h5py.File(filepath,'w')
 
-step=['070000','080000','090000']
-
-for istep in step:
-  #Vx
-  m1=np.zeros((2*nz, ny, nx))
-   
-  #Vy
-  delimiter = ''
-  mylist = ['Fields/',variable[1],'/',istep]
-  filepath = delimiter.join(mylist)
-  databk = h5file.get(filepath)
-  m1 = np.array(databk)
-  m1=np_data
-
-  m2=np.zeros((2*nz, ny, nx))
-  m2[nz/2-1:3*nz/2, ny, nx]=m1
-  h5new.create_dataset(filepath,data=m2)
-
-  #Vz
-  delimiter = ''
-  mylist = ['Fields/',variable[2],'/',istep]
-  filepath = delimiter.join(mylist)
-  databk = h5file.get(filepath)
-  m1 = np.array(databk)
-  m1=np_data
-
-  m2=np.zeros((2*nz, ny, nx))
-  m2[nz/2-1:3*nz/2, ny, nx]=m1
-  h5new.create_dataset(filepath,data=m2)
-
-  #pressure
-
-  delimiter = ''
-  mylist = ['Fields/',variable[3],'/',istep]
-  filepath = delimiter.join(mylist)
-  databk = h5file.get(filepath)
-  m1 = np.array(databk)
-  m1=np_data
-
-  m2=np.zeros((2*nz, ny, nx))
-
-  #largest mean pressure at lowest point  
-  pressLarge=np.mean(m1[0,:,:])
-  #smallest mean pressure at highest point
-  pressHigh=np.mean(m1[nz,:,:])
-  m2[nz/2-1:3*nz/2, ny, nx]=m1
-
-  for i in range(nz/2):
-
-    m2[i]=pressLarge+rhoL*g*dz*(nz/2-i)
-    m2[2*nz-i-1]=pressHigh-rhoH*g*dz*(nz/2-i)
-  h5new.create_dataset(filepath,data=m2)
+istep='700000'
+#read dataset dimensions
+mylist = ['Fields/','Prho','/',istep]
+filepath = delimiter.join(mylist)
+databk = h5file.get(filepath)
+m1 = np.array(databk)
+nz=m1.shape[0]
+ny=m1.shape[1]
+nx=m1.shape[2]
+dz=3.2/nz
 
 
 
-  #rho
-  delimiter = ''
-  mylist = ['Fields/',variable[4],'/',istep]
-  filepath = delimiter.join(mylist)
-  databk = h5file.get(filepath)
-  m1 = np.array(databk)
-  m1=np_data
+#Vx
+m2=np.zeros((2*nz, ny, nx))
+delimiter = ''
+mylist = ['Fields/',variable[0],'/',istep]
+filepath = delimiter.join(mylist)
+h5new.create_dataset(filepath,data=m2)
+ 
+#Vy
+delimiter = ''
+mylist = ['Fields/',variable[1],'/',istep]
+filepath = delimiter.join(mylist)
+databk = h5file.get(filepath)
+m1 = np.array(databk)
 
-  m2=np.zeros((2*nz, ny, nx))
-  m2[nz/2-1:3*nz/2, ny, nx]=m1
-  h5new.create_dataset(filepath,data=m2)
+m2=np.zeros((2*nz, ny, nx))
+m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
+h5new.create_dataset(filepath,data=m2)
+
+#Vz
+delimiter = ''
+mylist = ['Fields/',variable[2],'/',istep]
+filepath = delimiter.join(mylist)
+databk = h5file.get(filepath)
+m1 = np.array(databk)
+
+
+m2=np.zeros((2*nz, ny, nx))
+m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
+h5new.create_dataset(filepath,data=m2)
+
+#pressure
+
+delimiter = ''
+mylist = ['Fields/',variable[3],'/',istep]
+filepath = delimiter.join(mylist)
+databk = h5file.get(filepath)
+m1 = np.array(databk)
+
+
+m2=np.zeros((2*nz, ny, nx))
+
+#largest mean pressure at lowest point  
+pressLarge=np.mean(m1[0,:,:])
+#smallest mean pressure at highest point
+pressSmall=np.mean(m1[nz-1,:,:])
+m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
+
+for i in range(nz/2):
+  m2[i]=pressLarge+rhoL*g*dz*(nz/2-i)
+  m2[2*nz-i-1]=pressSmall-rhoH*g*dz*(nz/2-i)
+h5new.create_dataset(filepath,data=m2)
+
+
+
+#rho
+delimiter = ''
+mylist = ['Fields/',variable[4],'/',istep]
+filepath = delimiter.join(mylist)
+databk = h5file.get(filepath)
+m1 = np.array(databk)
+
+
+m2=np.zeros((2*nz, ny, nx))
+m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
+m2[0:nz/2, :, :]=rhoL
+m2[3*nz/2:2*nz, :, :]=rhoH
+h5new.create_dataset(filepath,data=m2)
 
 h5file.close()
 h5new.close()
