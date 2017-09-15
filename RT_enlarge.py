@@ -17,20 +17,23 @@ curfilePath = os.path.abspath(__file__)
 curDir = os.path.abspath(os.path.join(curfilePath,os.pardir))
 parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) 
 
-gamma=0.8
 #not used 
 #rhoL=1
 #rhoH=1.0833
-g=1.0
 
-mylist = [parentDir,'/','temp.h5']
+#specify inout parameters here
+g=1.0
+inFile='temp.h5'
+outFile="tests_single_new.h5"
+#input done
+
+mylist = [parentDir,'/',inFile]
 delimiter = ''
 filepath = delimiter.join(mylist)
-print filepath
 #nz enlarged only 
 variable = ['PVx','PVy','PVz','PPress', 'Prho']
 h5file = h5py.File(filepath,'r')
-mylist = [parentDir,'/','tests_single_new.h5']
+mylist = [parentDir,'/',outFile]
 delimiter = ''
 filepath = delimiter.join(mylist)
 h5new = h5py.File(filepath,'w')
