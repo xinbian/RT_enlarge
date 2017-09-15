@@ -22,11 +22,11 @@ delimiter = ''
 filepath = delimiter.join(mylist)
 #nz enlarge only 
 variable = ['PVx','PVy','PVz','PPress', 'Prho']
-h5file = h5py.File(filepath,'r')
+h5file = h5py.File('temp.h5','r')
 mylist = [parent_directory,'/','tests_single_large.h5']
 delimiter = ''
 filepath = delimiter.join(mylist)
-h5new = h5py.File(filepath,'w')
+h5new = h5py.File('tests_single_new','w')
 
 istep='000010'
 #read dataset dimensions
