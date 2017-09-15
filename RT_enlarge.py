@@ -1,32 +1,39 @@
 # -*- coding: utf-8 -*-
 """
-extend RT domain
+#you can use this to extend RT domain in z direction
+#orginal nx ny nz after nx ny 2*nz
+#velocity is set to zero 
+#density is set to horizotal average at top and bottom with 40 grid porints offset
+#pressure is similar to density and use hydrostatic equation rho*g*dz
 @author: Xin
 """
 
 import h5py
 import numpy as np
+import os
 import os.path
 
-
-current_directory = os.path.dirname(__file__)
-parent_directory = os.path.split(current_directory)[0]
+curfilePath = os.path.abspath(__file__)
+curDir = os.path.abspath(os.path.join(curfilePath,os.pardir))
+parentDir = os.path.abspath(os.path.join(curDir,os.pardir)) 
 
 gamma=0.8
-rhoL=1
-rhoH=1.0833
+#not used 
+#rhoL=1
+#rhoH=1.0833
 g=1.0
 
-mylist = [parent_directory,'/','temp.h5']
+mylist = [parentDir,'/','temp.h5']
 delimiter = ''
 filepath = delimiter.join(mylist)
-#nz enlarge only 
+print filepath
+#nz enlarged only 
 variable = ['PVx','PVy','PVz','PPress', 'Prho']
-h5file = h5py.File('temp.h5','r')
-mylist = [parent_directory,'/','tests_single_large.h5']
+h5file = h5py.File(filepath,'r')
+mylist = [parentDir,'/','tests_single_new.h5']
 delimiter = ''
 filepath = delimiter.join(mylist)
-h5new = h5py.File('tests_single_new.h5','w')
+h5new = h5py.File(filepath,'w')
 
 istep='001000'
 #read dataset dimensions
