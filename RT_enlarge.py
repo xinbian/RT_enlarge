@@ -28,7 +28,7 @@ delimiter = ''
 filepath = delimiter.join(mylist)
 h5new = h5py.File(filepath,'w')
 
-istep='700000'
+istep='000010'
 #read dataset dimensions
 mylist = ['Fields/','Prho','/',istep]
 filepath = delimiter.join(mylist)
@@ -71,6 +71,29 @@ m2=np.zeros((2*nz, ny, nx))
 m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
 h5new.create_dataset(filepath,data=m2)
 
+
+
+
+
+
+
+#rho
+delimiter = ''
+mylist = ['Fields/',variable[4],'/',istep]
+filepath = delimiter.join(mylist)
+databk = h5file.get(filepath)
+m1 = np.array(databk)
+
+rhoL=np.mean(m1[0,:,:])
+rhoH=np.mean(m1[nz-1,:,:])
+
+m2=np.zeros((2*nz, ny, nx))
+m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
+m2[0:nz/2, :, :]=rhoL
+m2[3*nz/2:2*nz, :, :]=rhoH
+h5new.create_dataset(filepath,data=m2)
+
+
 #pressure
 
 delimiter = ''
@@ -78,8 +101,6 @@ mylist = ['Fields/',variable[3],'/',istep]
 filepath = delimiter.join(mylist)
 databk = h5file.get(filepath)
 m1 = np.array(databk)
-
-
 m2=np.zeros((2*nz, ny, nx))
 
 #largest mean pressure at lowest point  
@@ -95,19 +116,6 @@ h5new.create_dataset(filepath,data=m2)
 
 
 
-#rho
-delimiter = ''
-mylist = ['Fields/',variable[4],'/',istep]
-filepath = delimiter.join(mylist)
-databk = h5file.get(filepath)
-m1 = np.array(databk)
-
-
-m2=np.zeros((2*nz, ny, nx))
-m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
-m2[0:nz/2, :, :]=rhoL
-m2[3*nz/2:2*nz, :, :]=rhoH
-h5new.create_dataset(filepath,data=m2)
 
 h5file.close()
 h5new.close()
