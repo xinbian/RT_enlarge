@@ -26,9 +26,9 @@ h5file = h5py.File('temp.h5','r')
 mylist = [parent_directory,'/','tests_single_large.h5']
 delimiter = ''
 filepath = delimiter.join(mylist)
-h5new = h5py.File('tests_single_new','w')
+h5new = h5py.File('tests_single_new.h5','w')
 
-istep='000010'
+istep='001000'
 #read dataset dimensions
 mylist = ['Fields/','Prho','/',istep]
 filepath = delimiter.join(mylist)
@@ -71,12 +71,6 @@ m2=np.zeros((2*nz, ny, nx))
 m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
 h5new.create_dataset(filepath,data=m2)
 
-
-
-
-
-
-
 #rho
 delimiter = ''
 mylist = ['Fields/',variable[4],'/',istep]
@@ -84,13 +78,15 @@ filepath = delimiter.join(mylist)
 databk = h5file.get(filepath)
 m1 = np.array(databk)
 
-rhoL=np.mean(m1[0,:,:])
-rhoH=np.mean(m1[nz-1,:,:])
+
+#calculate density 40 grid points away from bottom and top
+rhoL=np.mean(m1[0+40,:,:])
+rhoH=np.mean(m1[nz-1-40,:,:])
 
 m2=np.zeros((2*nz, ny, nx))
 m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
-m2[0:nz/2, :, :]=rhoL
-m2[3*nz/2:2*nz, :, :]=rhoH
+m2[0:nz/2+40, :, :]=rhoL
+m2[3*nz/2-40:2*nz, :, :]=rhoH
 h5new.create_dataset(filepath,data=m2)
 
 
@@ -102,16 +98,16 @@ filepath = delimiter.join(mylist)
 databk = h5file.get(filepath)
 m1 = np.array(databk)
 m2=np.zeros((2*nz, ny, nx))
-
+#also calcualte 40 grid points away
 #largest mean pressure at lowest point  
-pressLarge=np.mean(m1[0,:,:])
+pressLarge=np.mean(m1[0+40,:,:])
 #smallest mean pressure at highest point
-pressSmall=np.mean(m1[nz-1,:,:])
+pressSmall=np.mean(m1[nz-1-40,:,:])
 m2[nz/2:3*nz/2, :, :]=m1[0:nz, :, :]
 
-for i in range(nz/2):
-  m2[i]=pressLarge+rhoL*g*dz*(nz/2-i)
-  m2[2*nz-i-1]=pressSmall-rhoH*g*dz*(nz/2-i)
+for i in range(nz/2+40):
+  m2[i]=pressLarge+rhoL*g*dz*(nz/2+40-i)
+  m2[2*nz-i-1]=pressSmall-rhoH*g*dz*(nz/2+40-i)
 h5new.create_dataset(filepath,data=m2)
 
 
