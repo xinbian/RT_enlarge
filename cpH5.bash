@@ -32,4 +32,4 @@ for step in '020000' '030000' '040000' '050000'; do
 		echo "copying $var variable, $step step"
 
 	done
-
+done
